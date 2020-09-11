@@ -1,24 +1,17 @@
-{ lib, stdenv, fetchFromGitHub, fetchpatch, zlib, which, IOKit, qtbase, libusb-compat-0_1 }:
+{ lib, stdenv, fetchFromGitHub, zlib, which, IOKit, qtbase, libusb1 }:
 
 stdenv.mkDerivation rec {
   pname = "gpsbabel";
-  version = "1.6.0";
+  version = "1.7.0";
 
   src = fetchFromGitHub {
     owner = "gpsbabel";
     repo = "gpsbabel";
     rev = "gpsbabel_${lib.replaceStrings ["."] ["_"] version}";
-    sha256 = "0q17jhmaf7z5lld2ff7h6jb3v1yz8hbwd2rmaq2dsamc53dls8iw";
+    sha256 = "010g0vd2f5knpq5p7qfnl31kv3r8m5sjdsafcinbj5gh02j2nzpy";
   };
 
-  patches = [
-    (fetchpatch {
-      url = "https://sources.debian.net/data/main/g/gpsbabel/1.5.3-2/debian/patches/use_minizip";
-      sha256 = "03fpsmlx1wc48d1j405zkzp8j64hcp0z72islf4mk1immql3ibcr";
-    })
-  ];
-
-  buildInputs = [ zlib qtbase which libusb-compat-0_1 ]
+  buildInputs = [ zlib qtbase which libusb1 ]
     ++ lib.optionals stdenv.isDarwin [ IOKit ];
 
   /* FIXME: Building the documentation, with "make doc", requires this:
@@ -71,7 +64,7 @@ stdenv.mkDerivation rec {
     '';
     homepage = "http://www.gpsbabel.org/";
     license = licenses.gpl2Plus;
-    maintainers = [ maintainers.rycee ];
+    maintainers = with maintainers; [ rycee sikmir ];
     platforms = platforms.all;
   };
 }

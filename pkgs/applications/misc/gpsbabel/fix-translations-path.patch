@@ -1,0 +1,17 @@
+diff --git c/gui/mainwindow.cc i/gui/mainwindow.cc
+index 22b2b449..e216e3dc 100644
+--- c/gui/mainwindow.cc
++++ i/gui/mainwindow.cc
+@@ -324,9 +324,9 @@ void MainWindow::loadLanguage(const QString& rLanguage)
+     QLocale locale = QLocale(currLang_);
+     QLocale::setDefault(locale);
+ 
+-    switchTranslator(translator_, QString("gpsbabelfe_%1.qm").arg(rLanguage));
+-    switchTranslator(translatorCore_, QString("gpsbabel_%1.qm").arg(rLanguage));
+-    switchTranslator(translatorQt_, QString("qt_%1.qm").arg(rLanguage));
++    switchTranslator(translator_, QString("@out@/share/gpsbabel/translations/gpsbabelfe_%1.qm").arg(rLanguage));
++    switchTranslator(translatorCore_, QString("@out@/share/gpsbabel/translations/gpsbabel_%1.qm").arg(rLanguage));
++    switchTranslator(translatorQt_, QString("@qttranslations@/translations/qt_%1.qm").arg(rLanguage));
+   }
+ }
+ 

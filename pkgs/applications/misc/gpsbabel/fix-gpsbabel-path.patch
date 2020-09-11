@@ -1,0 +1,37 @@
+diff --git c/gui/formatload.cc i/gui/formatload.cc
+index 4c3cfdd0..2e18e3b0 100644
+--- c/gui/formatload.cc
++++ i/gui/formatload.cc
+@@ -144,7 +144,7 @@ bool FormatLoad::getFormats(QList<Format>& formatList)
+   formatList.clear();
+ 
+   QProcess babel;
+-  babel.start(QApplication::applicationDirPath() + "/gpsbabel", QStringList() << "-^3");
++  babel.start("@gpsbabel@/bin/gpsbabel", QStringList() << "-^3");
+   if (!babel.waitForStarted()) {
+     return false;
+   }
+diff --git c/gui/mainwindow.cc i/gui/mainwindow.cc
+index 22b2b449..1980581b 100644
+--- c/gui/mainwindow.cc
++++ i/gui/mainwindow.cc
+@@ -82,7 +82,7 @@ const int BabelData::deviceType_ = 1;
+ QString MainWindow::findBabelVersion()
+ {
+   QProcess babel;
+-  babel.start(QApplication::applicationDirPath() + "/gpsbabel", QStringList() << "-V");
++  babel.start("@gpsbabel@/bin/gpsbabel", QStringList() << "-V");
+   if (!babel.waitForStarted()) {
+     return QString();
+   }
+@@ -889,8 +889,8 @@ bool MainWindow::runGpsbabel(const QStringList& args, QString& errorString,
+                              QString& outputString)
+ {
+   auto* proc = new QProcess(nullptr);
+-  QString name = "gpsbabel";
+-  proc->start(QApplication::applicationDirPath() + '/' + name, args);
++  QString name = "@gpsbabel@/bin/gpsbabel";
++  proc->start(name, args);
+   auto* waitDlg = new ProcessWaitDialog(nullptr, proc);
+ 
+   if (proc->state() == QProcess::NotRunning) {
