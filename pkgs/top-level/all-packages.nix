@@ -27422,7 +27422,10 @@ with pkgs;
 
   gpsd = callPackage ../servers/gpsd { };
 
-  gpsprune = callPackage ../applications/misc/gpsprune { };
+  gpsprune = callPackage ../applications/misc/gpsprune {
+    # java3d doesn't work properly with jdk17
+    jdk = jdk11;
+  };
 
   gpu-screen-recorder = callPackage ../applications/video/gpu-screen-recorder {
     # rm me as soon as this package gains the support for cuda 11
