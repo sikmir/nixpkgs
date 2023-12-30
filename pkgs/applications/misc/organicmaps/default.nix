@@ -81,6 +81,11 @@ in stdenv.mkDerivation rec {
     bash ./configure.sh
   '';
 
+  postInstall = lib.optionalString stdenv.isDarwin ''
+    substituteInPlace $out/lib/pkgconfig/freetype2.pc \
+      --replace \$\{prefix\}/ ""
+  '';
+
   passthru = {
     updateScript = nix-update-script {
       extraArgs = [ "-vr" "(.*)-android" ];
@@ -88,8 +93,6 @@ in stdenv.mkDerivation rec {
   };
 
   meta = with lib; {
-    # darwin: "invalid application of 'sizeof' to a function type"
-    broken = stdenv.isDarwin;
     homepage = "https://organicmaps.app/";
     description = "Detailed Offline Maps for Travellers, Tourists, Hikers and Cyclists";
     license = licenses.asl20;
