@@ -1,4 +1,4 @@
-{ lib, stdenv, fetchFromGitHub, cmake } :
+{ lib, stdenv, fetchFromGitHub, fetchpatch, cmake, makeWrapper } :
 
 stdenv.mkDerivation rec {
   pname = "lzham";
@@ -7,15 +7,26 @@ stdenv.mkDerivation rec {
   src = fetchFromGitHub {
     owner = "richgel999";
     repo = "lzham_codec";
-    rev = "v${lib.replaceStrings ["."] ["_"] version}_release";
-    sha256 = "14c1zvzmp1ylp4pgayfdfk1kqjb23xj4f7ll1ra7b18wjxc9ja1v";
+    rev = "v${lib.replaceStrings ["."] ["_"] version}_stable1";
+    hash = "sha256-DX8c7ivXwohHOl5O63lucKxZMXL4nbwkYewrGhficD8=";
   };
 
-  nativeBuildInputs = [ cmake ];
+  patches = [
+    # Fix building on darwin
+    (fetchpatch {
+      url = "https://github.com/richgel999/lzham_codec/commit/c1dfe50b723a1410d466e63123ad42a9089b0e8a.patch";
+      hash = "sha256-GaklAGsCKHe6qJ+Ry7+iF3f5DI7sDdPJb34CpkcrVXQ=";
+    })
+  ];
 
-  installPhase = ''
-    mkdir -p $out/bin
-    cp ../bin_linux/lzhamtest $out/bin
+  nativeBuildInputs = [ cmake makeWrapper ];
+
+  postInstall = ''
+    install -Dm755 lzhamtest/lzhamtest -t $out/bin
+  '';
+
+  postFixup = lib.optionalString stdenv.isDarwin ''
+    wrapProgram $out/bin/lzhamtest --prefix DYLD_LIBRARY_PATH : $out/lib
   '';
 
   meta = with lib; {
@@ -23,6 +34,6 @@ stdenv.mkDerivation rec {
     mainProgram = "lzhamtest";
     homepage = "https://github.com/richgel999/lzham_codec";
     license = with licenses; [ mit ];
-    platforms = platforms.linux;
+    platforms = platforms.unix;
   };
 }
