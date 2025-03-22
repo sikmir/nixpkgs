@@ -12,8 +12,8 @@ stdenv.mkDerivation rec {
   version = "0.1.2";
 
   src = fetchurl {
-    url = "https://sigrok.org/download/source/libserialport/${pname}-${version}.tar.gz";
-    sha256 = "sha256-XeuStcpywDR7B7eGhINQ3sotz9l1zmE7jg4dlHpLTKk=";
+    url = "https://sigrok.org/download/source/libserialport/libserialport-${version}.tar.gz";
+    hash = "sha256-XeuStcpywDR7B7eGhINQ3sotz9l1zmE7jg4dlHpLTKk=";
   };
 
   nativeBuildInputs = [ pkg-config ];
@@ -25,7 +25,7 @@ stdenv.mkDerivation rec {
     description = "Cross-platform shared library for serial port access";
     homepage = "https://sigrok.org/";
     license = licenses.gpl3Plus;
-    platforms = platforms.linux ++ platforms.darwin;
+    platforms = platforms.linux ++ platforms.darwin ++ platforms.windows;
     maintainers = [ maintainers.bjornfor ];
   };
 }
