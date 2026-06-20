@@ -7,6 +7,7 @@
   rustPlatform,
   pkg-config,
   curl,
+  libuv,
   libz,
   openssl,
   postgresql,
@@ -16,10 +17,10 @@
 
 let
   # check package.metadata.mln in https://github.com/maplibre/maplibre-native-rs/blob/main/Cargo.toml
-  mlnRelease = "core-9b6325a14e2cf1cc29ab28c1855ad376f1ba4903";
+  mlnRelease = "core-cc8aa6fe74564180e2eed277dabd2043907c7fd8";
   mlnHeaders = fetchurl {
     url = "https://github.com/maplibre/maplibre-native/releases/download/${mlnRelease}/maplibre-native-headers.tar.gz";
-    hash = "sha256-VjVEc/+IZTBG9ixP/i7oeel+7gy3+DhSEOi2UDIqeLc=";
+    hash = "sha256-YqpJ0M5obJbBJlGD/VVcLx65zUlUQ5GcmR5K7y0hXTk=";
   };
   mlnLibrary = fetchurl (
     let
@@ -46,18 +47,18 @@ let
 in
 rustPlatform.buildRustPackage (finalAttrs: {
   pname = "martin";
-  version = "1.10.1";
+  version = "1.11.0";
 
   src = fetchFromGitHub {
     owner = "maplibre";
     repo = "martin";
     tag = "martin-v${finalAttrs.version}";
-    hash = "sha256-Zu3vkU7HQcSqzCL7n0uX4M+DxBDMC0Sii7esxM9AtpA=";
+    hash = "sha256-saqEcCuRz8Jlu8HTf0cjmNGDATasImfuFx1dbHHoARQ=";
   };
 
   patches = [ ./dont-build-webui.patch ];
 
-  cargoHash = "sha256-OPuUvm4ez5TZUWwJ6D6fqy++cCiVt7f1qP6OPdsOEDA=";
+  cargoHash = "sha256-JC6qIoyIQYQVBA43WwPXe5VW2qJOqWga3beq5t7I5rE=";
 
   webui = buildNpmPackage {
     pname = "martin-ui";
@@ -71,7 +72,7 @@ rustPlatform.buildRustPackage (finalAttrs: {
       ln -sf ${finalAttrs.src}/demo/frontend/public/favicon.ico public/_/assets/favicon.ico
     '';
 
-    npmDepsHash = "sha256-lX5FSWAQyy4Sa7OPnNyTYttjHiPuYxgrPsmZpwCnpO8=";
+    npmDepsHash = "sha256-e4LVUGUxwoiOJHhKn+4GQWbA5qbDtaak9FHMrmW+8Ts=";
 
     buildPhase = ''
       runHook preBuild
@@ -99,6 +100,7 @@ rustPlatform.buildRustPackage (finalAttrs: {
 
   buildInputs = [
     curl
+    libuv
     libz
     openssl
   ];
