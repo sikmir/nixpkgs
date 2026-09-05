@@ -2,7 +2,6 @@
   lib,
   stdenv,
   fetchFromGitLab,
-  fetchurl,
   makeDesktopItem,
   cmake,
   boost,
@@ -36,12 +35,16 @@ stdenv.mkDerivation (finalAttrs: {
   postPatch = ''
     substituteInPlace src/ovito/core/CMakeLists.txt \
       --replace-fail " IF(OVITO_BUILD_CONDA)" " IF(TRUE)"
+    substituteInPlace src/main/CMakeLists.txt \
+      --replace-fail 'INCLUDE("''${Ovito_SOURCE_DIR}/cmake/FixupMacBundle.cmake")' ""
   '';
 
   nativeBuildInputs = [
     cmake
     qt6Packages.wrapQtAppsHook
     wrapGAppsHook3
+  ]
+  ++ lib.optionals stdenv.hostPlatform.isLinux [
     imagemagick
     copyDesktopItems
   ];
@@ -60,6 +63,8 @@ stdenv.mkDerivation (finalAttrs: {
     qt6Packages.qtbase
     qt6Packages.qtsvg
     qt6Packages.qttools
+  ]
+  ++ lib.optionals stdenv.hostPlatform.isLinux [
     # needed to run natively on wayland
     qt6Packages.qtwayland
   ];
@@ -85,17 +90,18 @@ stdenv.mkDerivation (finalAttrs: {
     })
   ];
 
-  postInstall =
-    let
-      icon = fetchurl {
-        url = "https://www.ovito.org/wp-content/uploads/logo_rgb-768x737.png";
-        hash = "sha256-FOmIUeXem+4MjavQNag0UIlcR2wa2emJjivwxoJh6fI=";
-      };
-    in
-    ''
-      mkdir -p $out/share/icons/hicolor/512x512/apps
-      magick ${icon} -resize 512x512 $out/share/icons/hicolor/512x512/apps/ovito.png
-    '';
+  postInstall = lib.optionalString stdenv.hostPlatform.isLinux ''
+    mkdir -p $out/share/icons/hicolor/512x512/apps
+    magick $src/doc/manual/images/team/ovito_logo_256.png -resize 512x512 $out/share/icons/hicolor/512x512/apps/ovito.png
+  ''
+  + lib.optionalString stdenv.hostPlatform.isDarwin ''
+    mkdir -p $out/{Applications,bin}
+    mv $out/Ovito.app $out/Applications
+    ln -s $out/Applications/Ovito.app/Contents/MacOS/ovito $out/bin/ovito
+
+    # Prevent wrapping, otherwise plugins will not be loaded
+    chmod -x $out/Applications/Ovito.app/Contents/PlugIns/*.so $out/Applications/Ovito.app/Contents/MacOS/*.dylib
+  '';
 
   passthru.updateScript = nix-update-script { };
 
@@ -113,6 +119,5 @@ stdenv.mkDerivation (finalAttrs: {
       chn
       chillcicada
     ];
-    broken = stdenv.hostPlatform.isDarwin; # clang-11: error: no such file or directory: '$-DOVITO_COPYRIGHT_NOTICE=...
   };
 })
